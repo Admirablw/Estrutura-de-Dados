@@ -1,70 +1,110 @@
 #include <stdio.h>
 #include "lista.h"
+#include <string.h>
 
 int main() {
     BancoProdutos banco;
+    BancoListas listas;
     inicializar(&banco);
+    inicializar_listas(&listas);
 
     // Carregar produtos do CSV
     ler_csv(&banco, "./FrequenciaListaCompras/produtos.csv");
 
     int opcao;
-    char nome[TAM_NOME], tipo[TAM_NOME], novo_nome[TAM_NOME];
+    char nome[TAM_NOME], tipo[TAM_NOME], novo_nome[TAM_NOME], nome_lista[TAM_NOME];
 
-    do {
+ 	do {
         printf("\n==== MENU ====\n");
         printf("1. Adicionar produto\n");
         printf("2. Remover produto\n");
         printf("3. Alterar nome do produto\n");
         printf("4. Listar produtos\n");
+        printf("5. Criar lista de compras\n");
+        printf("6. Adicionar produto à lista de compras\n");
+        printf("7. Listar listas de compras\n");
+        printf("8. Listar produtos em uma lista de compras\n");
         printf("0. Sair\n");
-        printf("Opcao: ");
+        printf("Opção: ");
         scanf("%d", &opcao);
 
-        switch (opcao) {
-        case 1:
-            printf("Nome do produto: ");
-            scanf(" %[^\n]", nome);
-            printf("Tipo (frios, congelados, laticinios): ");
-            scanf(" %[^\n]", tipo);
-            if (adicionar_produto(&banco, nome, tipo))
-                printf("Produto adicionado com sucesso!\n");
-            else
-                printf("Erro ao adicionar produto.\n");
-            break;
-
-        case 2:
-            printf("Nome do produto a remover: ");
-            scanf(" %[^\n]", nome);
-            if (remover_produto(&banco, nome))
-                printf("Produto removido.\n");
-            else
-                printf("Produto nao encontrado.\n");
-            break;
-
-        case 3:
-            printf("Nome atual do produto: ");
-            scanf(" %[^\n]", nome);
-            printf("Novo nome: ");
-            scanf(" %[^\n]", novo_nome);
-            if (alterar_nome_produto(&banco, nome, novo_nome))
-                printf("Nome alterado.\n");
-            else
-                printf("Produto nao encontrado.\n");
-            break;
-
-        case 4:
-            listar_produtos(&banco);
-            break;
-
-        case 0:
-            printf("Saindo...\n");
-            break;
-
-        default:
-            printf("Opcao invalida!\n");
-        }
-    } while (opcao != 0);
-
-    return 0;
-}
+		switch (opcao) {
+			case 1:
+				printf("Nome do produto: ");
+				scanf(" %[^\n]", nome);
+				printf("Tipo (frios, congelados, laticinios): ");
+				scanf(" %[^\n]", tipo);
+				if (adicionar_produto(&banco, nome, tipo))
+					printf("Produto adicionado com sucesso!\n");
+				else
+					printf("Erro ao adicionar produto.\n");
+				break;
+	
+			case 2:
+				printf("Nome do produto a remover: ");
+				scanf(" %[^\n]", nome);
+				if (remover_produto(&banco, nome))
+					printf("Produto removido.\n");
+				else
+					printf("Produto não encontrado.\n");
+				break;
+	
+			case 3:
+				printf("Nome atual do produto: ");
+				scanf(" %[^\n]", nome);
+				printf("Novo nome: ");
+				scanf(" %[^\n]", novo_nome);
+				if (alterar_nome_produto(&banco, nome, novo_nome))
+					printf("Nome alterado.\n");
+				else
+					printf("Produto não encontrado.\n");
+				break;
+	
+			case 4:
+				listar_produtos(&banco);
+				break;
+	
+			case 5:
+				printf("Nome da nova lista de compras: ");
+				scanf(" %[^\n]", nome_lista);
+				if (adicionar_lista_compras(&listas, nome_lista))
+					printf("Lista de compras criada!\n");
+				else
+					printf("Erro ao criar lista de compras.\n");
+				break;
+	
+			case 6:
+				printf("Nome da lista de compras: ");
+				scanf(" %[^\n]", nome_lista);
+				printf("Nome do produto a adicionar: ");
+				scanf(" %[^\n]", nome);
+				Produto produto = {0};
+				strcpy(produto.nome, nome);
+				// Você pode buscar o produto no banco de dados e atribuir as outras informações
+				if (adicionar_produto_lista(&listas, nome_lista, produto))
+					printf("Produto adicionado à lista!\n");
+				else
+					printf("Erro ao adicionar produto à lista.\n");
+				break;
+	
+			case 7:
+				listar_listas_compras(&listas);
+				break;
+	
+			case 8:
+				printf("Nome da lista de compras: ");
+				scanf(" %[^\n]", nome_lista);
+				listar_produtos_lista(&listas, nome_lista);
+				break;
+	
+			case 0:
+				printf("Saindo...\n");
+				break;
+	
+			default:
+				printf("Opção inválida!\n");
+			}
+		} while (opcao != 0);
+	
+		return 0;
+	}

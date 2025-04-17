@@ -102,6 +102,54 @@ void listar_produtos(BancoProdutos *bp) {
     }
 }
 
+void inicializar_listas(BancoListas *bl) {
+    bl->total_listas = 0;
+}
+
+int adicionar_lista_compras(BancoListas *bl, const char *nome) {
+    if (bl->total_listas >= MAX_LISTAS) return 0;
+    strcpy(bl->listas[bl->total_listas].nome, nome);
+    bl->listas[bl->total_listas].total_produtos = 0;
+    bl->total_listas++;
+    return 1;
+}
+
+int adicionar_produto_lista(BancoListas *bl, const char *nome_lista, Produto produto) {
+    for (int i = 0; i < bl->total_listas; i++) {
+        if (_stricmp(bl->listas[i].nome, nome_lista) == 0) {
+            if (bl->listas[i].total_produtos < MAX_PRODUTOS) {
+                bl->listas[i].produtos[bl->listas[i].total_produtos] = produto;
+                bl->listas[i].total_produtos++;
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
+void listar_listas_compras(BancoListas *bl) {
+    for (int i = 0; i < bl->total_listas; i++) {
+        printf("Lista de Compras: %s\n", bl->listas[i].nome);
+    }
+}
+
+void listar_produtos_lista(BancoListas *bl, const char *nome_lista) {
+    for (int i = 0; i < bl->total_listas; i++) {
+        if (_stricmp(bl->listas[i].nome, nome_lista) == 0) {
+            printf("Produtos na lista: %s\n", nome_lista);
+            for (int j = 0; j < bl->listas[i].total_produtos; j++) {
+                printf("Nome: %s | Tipo: %s | Preço: %.2f | Loja: %s\n",
+                    bl->listas[i].produtos[j].nome,
+                    bl->listas[i].produtos[j].tipo,
+                    bl->listas[i].produtos[j].preco_minimo,
+                    bl->listas[i].produtos[j].loja);
+            }
+            return;
+        }
+    }
+    printf("Lista de compras não encontrada.\n");
+}
+
 char *strcasestr_custom(const char *haystack, const char *needle) {
     while (*haystack) {
         const char *h = haystack;
