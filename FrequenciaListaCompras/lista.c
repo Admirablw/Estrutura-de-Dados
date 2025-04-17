@@ -54,13 +54,13 @@ void listar_produtos(BancoProdutos *bp) {
     printf("1. Todos os produtos\n");
     printf("2. Produtos por nome (parcial)\n");
     printf("3. Produtos por tipo\n");
-    printf("Opção: ");
+    printf("Opcao: ");
     scanf("%d", &opcao);
 
     switch (opcao) {
         case 1:
             for (int i = 0; i < bp->total; i++) {
-                printf("Nome: %s | Tipo: %s | Preço: %.2f | Loja: %s\n",
+                printf("Nome: %s | Tipo: %s | Preco: %.2f | Loja: %s\n",
                     bp->lista[i].nome,
                     bp->lista[i].tipo,
                     bp->lista[i].preco_minimo,
@@ -73,7 +73,7 @@ void listar_produtos(BancoProdutos *bp) {
             scanf(" %[^\n]", filtro);
             for (int i = 0; i < bp->total; i++) {
                 if (strcasestr_custom(bp->lista[i].nome, filtro)) {
-                    printf("Nome: %s | Tipo: %s | Preço: %.2f | Loja: %s\n",
+                    printf("Nome: %s | Tipo: %s | Preco: %.2f | Loja: %s\n",
                         bp->lista[i].nome,
                         bp->lista[i].tipo,
                         bp->lista[i].preco_minimo,
@@ -87,7 +87,7 @@ void listar_produtos(BancoProdutos *bp) {
             scanf(" %[^\n]", filtro);
             for (int i = 0; i < bp->total; i++) {
                 if (_stricmp(bp->lista[i].tipo, filtro) == 0) {
-                    printf("Nome: %s | Tipo: %s | Preço: %.2f | Loja: %s\n",
+                    printf("Nome: %s | Tipo: %s | Preco: %.2f | Loja: %s\n",
                         bp->lista[i].nome,
                         bp->lista[i].tipo,
                         bp->lista[i].preco_minimo,
@@ -97,7 +97,7 @@ void listar_produtos(BancoProdutos *bp) {
             break;
 
         default:
-            printf("Opção inválida.\n");
+            printf("Opcao inválida.\n");
             break;
     }
 }
@@ -125,20 +125,20 @@ void ler_csv(BancoProdutos *bp, const char *arquivo) {
         return;
     }
 
-    // Pular o cabeçalho
+    // Pular o cabecalho
     char linha[256];
     fgets(linha, sizeof(linha), file);
 
     // Ler produtos do CSV
     while (fgets(linha, sizeof(linha), file)) {
         Produto produto;
-        char preco[20]; // Para ler o preço como string e depois converter
+        char preco[20]; // Para ler o preco como string e depois converter
 
-        // Lê o nome, tipo, preço e loja
+        // Lê o nome, tipo, preco e loja
         sscanf(linha, "%99[^,],%99[^,],%19[^,],%99[^\n]",
                produto.nome, produto.tipo, preco, produto.loja);
 
-        // Converte o preço para float
+        // Converte o preco para float
         produto.preco_minimo = atof(preco);
 
         // Adiciona o produto ao banco de produtos
