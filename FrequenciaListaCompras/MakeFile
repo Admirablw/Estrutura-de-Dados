@@ -1,0 +1,14 @@
+CC = gcc
+CFLAGS = -Wall -Wextra -std=c99
+
+SRC = main.c lista.c
+OBJ = $(SRC:.c=.o)
+EXEC = programa
+
+all: $(EXEC)
+
+$(EXEC): $(OBJ)
+	$(CC) $(CFLAGS) -o $@ $^
+
+clean:
+	del *.o *.exe  # No Linux/macOS: rm -f *.o $(EXEC)
