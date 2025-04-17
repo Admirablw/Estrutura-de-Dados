@@ -22,8 +22,9 @@ int main() {
         printf("4. Listar produtos\n");
         printf("5. Criar lista de compras\n");
         printf("6. Adicionar produto à lista de compras\n");
-        printf("7. Listar listas de compras\n");
-        printf("8. Listar produtos em uma lista de compras\n");
+        printf("7. Remover produto da lista de compras\n");
+        printf("8. Listar listas de compras\n");
+        printf("9. Listar produtos em uma lista de compras\n");
         printf("0. Sair\n");
         printf("Opção: ");
         scanf("%d", &opcao);
@@ -76,22 +77,41 @@ int main() {
 			case 6:
 				printf("Nome da lista de compras: ");
 				scanf(" %[^\n]", nome_lista);
+                listar_produtos(&banco);
 				printf("Nome do produto a adicionar: ");
 				scanf(" %[^\n]", nome);
 				Produto produto = {0};
 				strcpy(produto.nome, nome);
 				// Você pode buscar o produto no banco de dados e atribuir as outras informações
-				if (adicionar_produto_lista(&listas, nome_lista, produto))
+				if (adicionar_produto_lista(&listas, nome_lista, produto, &banco))
 					printf("Produto adicionado à lista!\n");
 				else
 					printf("Erro ao adicionar produto à lista.\n");
 				break;
-	
-			case 7:
+            case 7:
+                printf("Nome da lista de compras: ");
+                scanf(" %[^\n]", nome_lista);
+            
+                listar_produtos_lista(&listas, nome_lista);
+            
+                printf("Nome do produto a remover: ");
+                scanf(" %[^\n]", nome);
+            
+                
+                strcpy(produto.nome, nome);
+                
+                if (remover_produto_lista(&listas, nome_lista, produto)) {
+                    printf("Produto removido da lista com sucesso!\n");
+                } else {
+                    printf("Erro ao remover produto da lista.\n");
+                }
+                break;
+            
+			case 8:
 				listar_listas_compras(&listas);
 				break;
 	
-			case 8:
+			case 9:
 				printf("Nome da lista de compras: ");
 				scanf(" %[^\n]", nome_lista);
 				listar_produtos_lista(&listas, nome_lista);
@@ -105,6 +125,7 @@ int main() {
 				printf("Opção inválida!\n");
 			}
 		} while (opcao != 0);
-	
+        destruir(&banco);
+        destruir_listas(&listas);
 		return 0;
 	}

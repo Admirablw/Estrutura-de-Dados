@@ -10,22 +10,25 @@ typedef struct {
 	char tipo[TAM_NOME];
 	float preco_minimo;
 	char loja[TAM_NOME];
+	
 } Produto;
-
 typedef struct {
-	Produto lista[MAX_PRODUTOS];
-	int total;
+    Produto *lista;
+    int total;
+    int capacidade;
 } BancoProdutos;
 
 typedef struct {
     char nome[TAM_NOME];
-    Produto produtos[MAX_PRODUTOS];
+    Produto *produtos;
     int total_produtos;
+    int capacidade_produtos;
 } ListaCompras;
 
 typedef struct {
-    ListaCompras listas[MAX_LISTAS];
+    ListaCompras *listas;
     int total_listas;
+    int capacidade_listas;
 } BancoListas;
 
 void inicializar(BancoProdutos *bp);
@@ -38,7 +41,12 @@ void ler_csv(BancoProdutos *bp, const char *nome_arquivo);
 
 void inicializar_listas(BancoListas *bl);
 int adicionar_lista_compras(BancoListas *bl, const char *nome);
-int adicionar_produto_lista(BancoListas *bl, const char *nome_lista, Produto produto);
+int adicionar_produto_lista(BancoListas *bl, const char *nome_lista, Produto produto, BancoProdutos *bp);
+int remover_produto_lista(BancoListas *bl, const char *nome_lista, Produto produto);
 void listar_listas_compras(BancoListas *bl);
 void listar_produtos_lista(BancoListas *bl, const char *nome_lista);
+
+void destruir(BancoProdutos *bp);
+void destruir_listas(BancoListas *bl);
+
 #endif

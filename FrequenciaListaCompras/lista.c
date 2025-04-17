@@ -6,22 +6,36 @@
 
 void inicializar(BancoProdutos *bp) {
     bp->total = 0;
+    bp->capacidade = 10;  // Inicialmente alocando para 10 produtos
+    bp->lista = (Produto *)malloc(bp->capacidade * sizeof(Produto));
+    if (bp->lista == NULL) {
+        // Se a alocação falhar, imprime uma mensagem de erro e retorna.
+        printf("Erro ao alocar memória para produtos.\n");
+        exit(1);
+    }
 }
 
 int adicionar_produto(BancoProdutos *bp, const char *nome, const char *tipo) {
-    if (bp->total >= MAX_PRODUTOS) return 0;
-
-    for (int i = 0; i < bp->total; i++) {
-        if (_stricmp(bp->lista[i].nome, nome) == 0) return 0;
+    if (bp->total >= bp->capacidade) {
+        // Realoca a memória para mais produtos, duplicando a capacidade
+        bp->capacidade *= 2;
+        bp->lista = (Produto *)realloc(bp->lista, bp->capacidade * sizeof(Produto));
+        if (bp->lista == NULL) {
+            printf("Erro ao realocar memória para produtos.\n");
+            return -1;
+        }
     }
 
-    strcpy(bp->lista[bp->total].nome, nome);
-    strcpy(bp->lista[bp->total].tipo, tipo);
-    bp->lista[bp->total].preco_minimo = 0.0;
-    bp->lista[bp->total].loja[0] = '\0';
-    bp->total++;
+    // Adiciona o produto na lista
+    Produto novo_produto;
+    strncpy(novo_produto.nome, nome, TAM_NOME);
+    strncpy(novo_produto.tipo, tipo, TAM_NOME);
+    // Atribuir valores padrão para o preço e a loja, por exemplo
+    novo_produto.preco_minimo = 0.0;
+    strncpy(novo_produto.loja, "Desconhecida", TAM_NOME);
 
-    return 1;
+    bp->lista[bp->total++] = novo_produto;
+    return 0;
 }
 
 int remover_produto(BancoProdutos *bp, const char *nome) {
@@ -86,7 +100,7 @@ void listar_produtos(BancoProdutos *bp) {
             printf("Digite o tipo: ");
             scanf(" %[^\n]", filtro);
             for (int i = 0; i < bp->total; i++) {
-                if (_stricmp(bp->lista[i].tipo, filtro) == 0) {
+                if (strcasestr_custom(bp->lista[i].tipo, filtro) == 0) {
                     printf("Nome: %s | Tipo: %s | Preco: %.2f | Loja: %s\n",
                         bp->lista[i].nome,
                         bp->lista[i].tipo,
@@ -104,28 +118,101 @@ void listar_produtos(BancoProdutos *bp) {
 
 void inicializar_listas(BancoListas *bl) {
     bl->total_listas = 0;
+    bl->capacidade_listas = 10; // Alocação inicial para 10 listas
+    bl->listas = (ListaCompras *)malloc(bl->capacidade_listas * sizeof(ListaCompras));
+    if (bl->listas == NULL) {
+        printf("Erro ao alocar memória para listas de compras.\n");
+        exit(1);
+    }
 }
 
+
 int adicionar_lista_compras(BancoListas *bl, const char *nome) {
-    if (bl->total_listas >= MAX_LISTAS) return 0;
+    if (bl->total_listas >= bl->capacidade_listas) {
+        // Realoca a memória para mais listas
+        bl->capacidade_listas *= 2;
+        bl->listas = (ListaCompras *)realloc(bl->listas, bl->capacidade_listas * sizeof(ListaCompras));
+        if (bl->listas == NULL) {
+            printf("Erro ao realocar memória para listas de compras.\n");
+            return 0;
+        }
+    }
+
+    // Adiciona a nova lista de compras
     strcpy(bl->listas[bl->total_listas].nome, nome);
+    bl->listas[bl->total_listas].produtos = (Produto *)malloc(MAX_PRODUTOS * sizeof(Produto)); // Aloca para os produtos na lista
+    if (bl->listas[bl->total_listas].produtos == NULL) {
+        printf("Erro ao alocar memória para produtos da lista.\n");
+        return 0;
+    }
     bl->listas[bl->total_listas].total_produtos = 0;
     bl->total_listas++;
     return 1;
 }
 
-int adicionar_produto_lista(BancoListas *bl, const char *nome_lista, Produto produto) {
+int adicionar_produto_lista(BancoListas *bl, const char *nome_lista, Produto produto, BancoProdutos *bp) {
     for (int i = 0; i < bl->total_listas; i++) {
         if (_stricmp(bl->listas[i].nome, nome_lista) == 0) {
+            // Verifica se há espaço para mais produtos na lista de compras
             if (bl->listas[i].total_produtos < MAX_PRODUTOS) {
+                // Verifica se o produto já existe no banco de produtos, usando o nome do produto
+                for (int j = 0; j < bp->total; j++) {
+                    // Aqui, estamos tentando verificar se o nome do produto já existe no banco
+                    if (_stricmp(bp->lista[j].nome, produto.nome) == 0) {
+                        // Copia os dados do produto encontrado no banco de produtos para o produto na lista
+                        Produto prod = bp->lista[j];  // Cópia do produto
+                        
+                        // Agora, adiciona o produto à lista de compras
+                        bl->listas[i].produtos[bl->listas[i].total_produtos] = prod;
+                        bl->listas[i].total_produtos++;
+                        return 1;
+                    }
+                }
+                // Se o produto não existir no banco, adiciona diretamente à lista (sem verificações)
                 bl->listas[i].produtos[bl->listas[i].total_produtos] = produto;
                 bl->listas[i].total_produtos++;
                 return 1;
             }
         }
     }
-    return 0;
+    return 0; // Caso a lista de compras não seja encontrada ou não haja espaço
 }
+
+int remover_produto_lista(BancoListas *bl, const char *nome_lista, Produto produto) {
+	// Procurar pela lista de compras pelo nome
+	for (int i = 0; i < bl->total_listas; i++) {
+		if (_stricmp(bl->listas[i].nome, nome_lista) == 0) {
+			// Encontrou a lista de compras correspondente
+
+			// Procurar o produto a ser removido dentro dessa lista
+			for (int j = 0; j < bl->listas[i].total_produtos; j++) {
+				if (_stricmp(bl->listas[i].produtos[j].nome, produto.nome) == 0) {
+					// Encontrou o produto a ser removido
+
+					// Reorganizar os produtos para não deixar "lacunas"
+					for (int k = j; k < bl->listas[i].total_produtos - 1; k++) {
+						bl->listas[i].produtos[k] = bl->listas[i].produtos[k + 1];
+					}
+
+					// Decrementa o total de produtos da lista
+					bl->listas[i].total_produtos--;
+
+					printf("Produto '%s' removido com sucesso da lista '%s'.\n", produto.nome, nome_lista);
+					return 1;  // Produto removido com sucesso
+				}
+			}
+
+			// Se o produto não foi encontrado na lista
+			printf("Produto '%s' não encontrado na lista '%s'.\n", produto.nome, nome_lista);
+			return 0;  // Produto não encontrado
+		}
+	}
+
+	// Se a lista de compras não foi encontrada
+	printf("Lista de compras '%s' não encontrada.\n", nome_lista);
+	return 0;  // Lista não encontrada
+}
+
 
 void listar_listas_compras(BancoListas *bl) {
     for (int i = 0; i < bl->total_listas; i++) {
@@ -196,4 +283,20 @@ void ler_csv(BancoProdutos *bp, const char *arquivo) {
     }
 
     fclose(file);
+}
+
+
+
+void destruir(BancoProdutos *bp) {
+    free(bp->lista);  // Libera a memória alocada para o banco de produtos
+}
+
+void destruir_listas(BancoListas *bl) {
+    // Libera a memória alocada para cada lista de compras
+    for (int i = 0; i < bl->total_listas; i++) {
+        free(bl->listas[i].produtos);  // Libera a memória dos produtos em cada lista
+    }
+
+    // Libera a memória alocada para o array de listas de compras
+    free(bl->listas);
 }
