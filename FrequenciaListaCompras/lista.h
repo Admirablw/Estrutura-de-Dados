@@ -10,7 +10,7 @@ typedef struct {
 	char tipo[TAM_NOME];
 	float preco_minimo;
 	char loja[TAM_NOME];
-	
+	int comprado;
 } Produto;
 typedef struct {
     Produto *lista;
@@ -45,6 +45,7 @@ int adicionar_produto_lista(BancoListas *bl, const char *nome_lista, Produto pro
 int remover_produto_lista(BancoListas *bl, const char *nome_lista, Produto produto);
 void listar_listas_compras(BancoListas *bl);
 void listar_produtos_lista(BancoListas *bl, const char *nome_lista);
+int marcar_produto_lista(BancoListas *bl, const char *nome_lista, const char *nome_produto, int status);
 
 void destruir(BancoProdutos *bp);
 void destruir_listas(BancoListas *bl);

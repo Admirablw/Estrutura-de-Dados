@@ -8,7 +8,7 @@ int main() {
     inicializar(&banco);
     inicializar_listas(&listas);
 
-    // Carregar produtos do CSV
+    
     ler_csv(&banco, "./FrequenciaListaCompras/produtos.csv");
 
     int opcao;
@@ -25,8 +25,9 @@ int main() {
         printf("7. Remover produto da lista de compras\n");
         printf("8. Listar listas de compras\n");
         printf("9. Listar produtos em uma lista de compras\n");
+        printf("10. Marcar ou Desmarcar Produto em uma lista de compras");
         printf("0. Sair\n");
-        printf("Opção: ");
+        printf("Opcao: ");
         scanf("%d", &opcao);
 
 		switch (opcao) {
@@ -47,7 +48,7 @@ int main() {
 				if (remover_produto(&banco, nome))
 					printf("Produto removido.\n");
 				else
-					printf("Produto não encontrado.\n");
+					printf("Produto nao encontrado.\n");
 				break;
 	
 			case 3:
@@ -58,7 +59,7 @@ int main() {
 				if (alterar_nome_produto(&banco, nome, novo_nome))
 					printf("Nome alterado.\n");
 				else
-					printf("Produto não encontrado.\n");
+					printf("Produto nao encontrado.\n");
 				break;
 	
 			case 4:
@@ -82,7 +83,7 @@ int main() {
 				scanf(" %[^\n]", nome);
 				Produto produto = {0};
 				strcpy(produto.nome, nome);
-				// Você pode buscar o produto no banco de dados e atribuir as outras informações
+				
 				if (adicionar_produto_lista(&listas, nome_lista, produto, &banco))
 					printf("Produto adicionado à lista!\n");
 				else
@@ -116,13 +117,28 @@ int main() {
 				scanf(" %[^\n]", nome_lista);
 				listar_produtos_lista(&listas, nome_lista);
 				break;
-	
+            case 10:
+	            printf("Nome da lista: ");
+	            scanf(" %[^\n]", nome_lista);
+                listar_produtos_lista(&listas, nome_lista);
+	            printf("Nome do produto: ");
+	            scanf(" %[^\n]", nome);
+	            printf("1 - Marcar como comprado\n0 - Marcar como pendente\nEscolha: ");
+	            int status;
+	            scanf("%d", &status);
+	            if (marcar_produto_lista(&listas, nome_lista, nome, status)) {
+		            printf("Status atualizado!\n");
+	            } else {
+		            printf("Erro ao atualizar o status.\n");
+	            }
+	            break;
+
 			case 0:
 				printf("Saindo...\n");
 				break;
 	
 			default:
-				printf("Opção inválida!\n");
+				printf("Opcao invalida!\n");
 			}
 		} while (opcao != 0);
         destruir(&banco);
